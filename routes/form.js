@@ -6,6 +6,7 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 const hubspot = require("@hubspot/api-client");
+const axios = require("axios");
 
 const router = Router();
 
@@ -53,5 +54,27 @@ router.post(
     }
   }
 );
+
+router.post("/captcha", (req, res) => {
+  const { token } = req.body;
+  const url = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.CAPTCHA_SECRET_KEY}&response=${token}`;
+
+  axios
+    .post(url, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+      },
+    })
+    .then((response) => {
+      res.json({
+        message: response.data,
+      });
+    })
+    .catch((error) => {
+      res.json({
+        message: error,
+      });
+    });
+});
 
 module.exports = router;
