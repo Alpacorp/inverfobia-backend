@@ -28,9 +28,11 @@ router.post(
     check("lastname", "Lastname is required").not().isEmpty(),
     check("email", "Email is required").isEmail(),
     check("phone", "Password is required").not().isEmpty(),
+    check("company", "Company is required").not().isEmpty(),
+    check("website", "Website is required").not().isEmpty(),
   ],
   async (req, res) => {
-    const { firstname, lastname, email, phone } = req.body;
+    const { firstname, lastname, email, phone, website, company } = req.body;
     const hubspotClient = new hubspot.Client({
       accessToken: `${process.env.ACCESS_TOKEN}`,
     });
@@ -41,6 +43,8 @@ router.post(
           lastname: lastname,
           email: email,
           phone: phone,
+          website: website,
+          company: company,
         },
         lifecycleStage: "customer",
       });
