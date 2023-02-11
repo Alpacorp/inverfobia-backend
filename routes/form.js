@@ -30,9 +30,11 @@ router.post(
     check("phone", "Password is required").not().isEmpty(),
     check("company", "Company is required").not().isEmpty(),
     check("website", "Website is required").not().isEmpty(),
+    check("scoreinv", "Score is required").not().isEmpty().isNumeric(),
   ],
   async (req, res) => {
-    const { firstname, lastname, email, phone, website, company } = req.body;
+    const { firstname, lastname, email, phone, website, company, scoreinv } =
+      req.body;
     const hubspotClient = new hubspot.Client({
       accessToken: `${process.env.ACCESS_TOKEN}`,
     });
@@ -45,6 +47,56 @@ router.post(
           phone: phone,
           website: website,
           company: company,
+          scoreinv: scoreinv,
+        },
+        lifecycleStage: "customer",
+      });
+      res.json({
+        message: contact,
+      });
+    } catch (error) {
+      res.json({
+        message: error,
+      });
+    }
+  }
+);
+
+router.patch(
+  "/hubspot/contact",
+  [
+    check("firstname", "Name is required").not().isEmpty(),
+    check("lastname", "Lastname is required").not().isEmpty(),
+    check("email", "Email is required").isEmail(),
+    check("phone", "Password is required").not().isEmpty(),
+    check("company", "Company is required").not().isEmpty(),
+    check("website", "Website is required").not().isEmpty(),
+    check("scoreinv", "Score is required").not().isEmpty().isNumeric(),
+  ],
+  async (req, res) => {
+    const {
+      firstname,
+      lastname,
+      email,
+      phone,
+      website,
+      company,
+      scoreinv,
+      id,
+    } = req.body;
+    const hubspotClient = new hubspot.Client({
+      accessToken: `${process.env.ACCESS_TOKEN}`,
+    });
+    try {
+      const contact = await hubspotClient.crm.contacts.basicApi.update(id, {
+        properties: {
+          firstname: firstname,
+          lastname: lastname,
+          email: email,
+          phone: phone,
+          website: website,
+          company: company,
+          scoreinv: scoreinv,
         },
         lifecycleStage: "customer",
       });
